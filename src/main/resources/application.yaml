@@ -11,8 +11,8 @@ spring:
 
   data:
     redis:
-      host: ${SPRING_REDIS_HOST}
-      port: ${SPRING_REDIS_PORT}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
   jpa:
     open-in-view: false
