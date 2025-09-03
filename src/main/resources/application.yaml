@@ -8,6 +8,9 @@ spring:
     url: jdbc:mysql://${DB_HOST:localhost}:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
+  sql:
+    init:
+      mode: always
 
   data:
     redis:
