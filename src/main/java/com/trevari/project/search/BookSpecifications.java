@@ -9,7 +9,10 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookSpecifications {
+public final class BookSpecifications {
+
+    private BookSpecifications() {} // 순수 유틸 클래스: 인스턴스화 방지
+
     private static final List<String> FIELDS =
             List.of("isbn", "title", "subtitle", "author", "publisher");
 
@@ -23,7 +26,7 @@ public class BookSpecifications {
         for (String f : FIELDS) {
             preds.add(cb.like(cb.lower(cb.coalesce(root.get(f), "")), like));
         }
-        return cb.or(preds.toArray(new Predicate[preds.size()]));
+        return cb.or(preds.toArray(new Predicate[0]));
     }
 
     private static Specification<Book> contains(String kw) {
@@ -40,7 +43,7 @@ public class BookSpecifications {
             case SIMPLE -> {
                 String left = sq.left();
                 if (left == null || left.isBlank()) {
-                    // 빈 키워드: 항상 false → 결과 0건
+                    // 빈 키워드: 항상 false -> 결과 0건
                     yield (root, q, cb) -> cb.disjunction();
                 }
                 yield contains(left);
