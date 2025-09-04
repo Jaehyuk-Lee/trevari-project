@@ -1,0 +1,14 @@
+spring:
+  sql:
+    init:
+      mode: never # test 프로파일에서 data.sql 비활성화
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DATABASE_TO_LOWER=TRUE;IGNORECASE=TRUE
+    driverClassName: org.h2.Driver
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
