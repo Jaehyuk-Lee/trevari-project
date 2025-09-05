@@ -1,5 +1,6 @@
 package com.trevari.project.service;
 
+import com.trevari.project.api.dto.SearchDTOs;
 import com.trevari.project.domain.Book;
 import com.trevari.project.repository.BookRepository;
 import com.trevari.project.search.SearchQuery;
@@ -30,8 +31,8 @@ class SearchServiceTest {
     @Captor ArgumentCaptor<Pageable> pageableCaptor;
 
     @Test
-    @DisplayName("search() - Repository를 올바른 인자로 1회 호출하고, 반환을 그대로 전달한다")
-    void search_callsRepositoryOnce_withPolicyPageable_andReturnsAsIs() {
+    @DisplayName("getSearchDTO() - Repository를 올바른 인자로 1회 호출하고, DTO 응답 생성")
+    void getSearchResponse_callsRepositoryOnce_andBuildsDTO() {
         // given
         var query = new SearchQuery("ti", "ti", null, SearchStrategy.SIMPLE);
         var pageable = PageRequest.of(0, 10);
@@ -47,10 +48,13 @@ class SearchServiceTest {
                 .thenReturn(expected);
 
         // when
-        Page<Book> result = searchService.search(query, pageable);
+        SearchDTOs.Response response = searchService.getSearchDTO(query, pageable);
 
-        // then
-        assertThat(result).isSameAs(expected);
+        // then: DTO 변환 확인
+        assertThat(response).isNotNull();
+        assertThat(response.books()).hasSize(1);
+        assertThat(response.searchQuery()).isEqualTo(query.query());
+        assertThat(response.searchMetadata().strategy()).isEqualTo(query.strategy());
 
         verify(bookRepository, Mockito.times(1))
                 .findAll(ArgumentMatchers.<Specification<Book>>any(), pageableCaptor.capture());
@@ -62,8 +66,8 @@ class SearchServiceTest {
     }
 
     @Test
-    @DisplayName("search() - 빈 결과도 그대로 반환한다")
-    void search_returnsEmptyPage() {
+    @DisplayName("getSearchDTO() - 빈 결과도 빈 DTO 리스트로 반환")
+    void getSearchResponse_returnsEmptyList() {
         // given
         var query = new SearchQuery("ti", "ti", null, SearchStrategy.SIMPLE);
         var pageable = PageRequest.of(0, 10);
@@ -71,10 +75,11 @@ class SearchServiceTest {
                 .thenReturn(Page.empty(pageable));
 
         // when
-        Page<Book> result = searchService.search(query, pageable);
+        SearchDTOs.Response response = searchService.getSearchDTO(query, pageable);
 
         // then
-        assertThat(result).isNotNull().isEmpty();
+        assertThat(response).isNotNull();
+        assertThat(response.books()).isEmpty();
         verify(bookRepository).findAll(ArgumentMatchers.<Specification<Book>>any(), any(Pageable.class));
         verifyNoMoreInteractions(bookRepository);
     }
