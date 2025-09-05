@@ -1,16 +1,4 @@
 package com.trevari.project.search;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
-public class SearchQuery {
-    private final String query;
-    private final String left;
-    private final String right;
-    private final SearchStrategy strategy;
-
-    public String query() { return query; }
-    public String left() { return left; }
-    public String right() { return right; }
-    public SearchStrategy strategy() { return strategy; }
+public record SearchQuery(String query, String left, String right, SearchStrategy strategy) {
 }
