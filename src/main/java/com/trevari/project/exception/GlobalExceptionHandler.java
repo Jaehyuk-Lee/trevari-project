@@ -22,4 +22,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    /**
+     * 검색 조건에 맞는 도서를 찾지 못한 경우 404 NotFound 응답 반환
+     */
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("status", "error");
+        errorResponse.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 }
