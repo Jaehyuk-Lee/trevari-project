@@ -9,6 +9,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class SearchQueryParserTest {
 
     @Test
+    @DisplayName("단순 검색 API: simple()는 연산자 해석 없이 전체를 SIMPLE로 처리")
+    void parse_simple_api_method() {
+        SearchQuery q = SearchQueryParser.simple("  a|B  ");
+        assertEquals("a|b", q.query());
+        assertEquals("a|b", q.left());
+        assertNull(q.right());
+        assertEquals(SearchStrategy.SIMPLE, q.strategy());
+    }
+
+    @Test
     @DisplayName("단순 키워드 파싱: 공백 제거 및 소문자 정규화")
     void parse_simple_keyword() {
     SearchQuery q = SearchQueryParser.parse("  HelloWorld  ");
