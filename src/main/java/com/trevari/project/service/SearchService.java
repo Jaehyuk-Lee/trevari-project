@@ -1,5 +1,6 @@
 package com.trevari.project.service;
 
+import com.trevari.project.api.dto.SearchDTOs;
 import com.trevari.project.domain.Book;
 import com.trevari.project.repository.BookRepository;
 import com.trevari.project.search.BookSpecifications;
@@ -16,7 +17,28 @@ public class SearchService {
     private final BookRepository bookRepository;
 
     @Transactional(readOnly = true)
-    public Page<Book> search(SearchQuery searchQuery, Pageable pageable) {
-        return bookRepository.findAll(BookSpecifications.forQuery(searchQuery), pageable);
+    public SearchDTOs.Response getSearchDTO(SearchQuery searchQuery, Pageable pageable) {
+        Page<Book> pageData = bookRepository.findAll(BookSpecifications.forQuery(searchQuery), pageable);
+        var items = pageData.getContent().stream()
+            .map(b -> new SearchDTOs.Book(
+                b.getIsbn(), b.getTitle(), b.getSubtitle(), b.getImage(),
+                b.getAuthor(), b.getIsbn(), b.getPublishedDate()
+            ))
+            .toList();
+
+        var pageInfo = new SearchDTOs.PageInfo(
+                pageable.getPageNumber() + 1,
+                pageable.getPageSize(),
+                pageData.getTotalPages(),
+                pageData.getTotalElements()
+        );
+
+        var metadata = new SearchDTOs.Metadata(
+            0L, searchQuery.strategy()
+        );
+
+        return new SearchDTOs.Response(
+            searchQuery.query(), pageInfo, items, metadata
+        );
     }
 }
