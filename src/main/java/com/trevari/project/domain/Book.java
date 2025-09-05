@@ -10,14 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "isbn")
 @Entity
-@Table(
-        name = "books",
-        indexes = {
-                @Index(name = "idx_books_title", columnList = "title"),
-                @Index(name = "idx_books_author", columnList = "author"),
-                @Index(name = "idx_books_publisher", columnList = "publisher")
-        }
-)
+@Table(name = "books")
 public class Book {
 
     @Id
