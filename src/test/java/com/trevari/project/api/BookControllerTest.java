@@ -1,9 +1,11 @@
 package com.trevari.project.api;
 
 import com.trevari.project.api.dto.SearchDTOs;
+import com.trevari.project.api.dto.SearchKeyword;
 import com.trevari.project.search.SearchQuery;
 import com.trevari.project.search.SearchStrategy;
 import com.trevari.project.service.BookService;
+import com.trevari.project.service.SearchAggregateService;
 import com.trevari.project.service.SearchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,6 +39,9 @@ class BookControllerTest {
     @Mock
     private BookService bookService;
 
+    @Mock
+    private SearchAggregateService searchAggregateService;
+
     @InjectMocks
     private BookController bookController;
 
@@ -45,7 +51,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("/api/books/{ID}: ID로 도서 반환")
+    @DisplayName("GET /api/books/{ID}: ID로 도서 반환")
     void get_book_by_id_returns_book() throws Exception {
         SearchDTOs.Book book = new SearchDTOs.Book(
             "9786247377209",
@@ -65,7 +71,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("/api/books: SIMPLE 모드로 페이지 결과 반환")
+    @DisplayName("GET /api/books: SIMPLE 모드로 페이지 결과 반환")
     void browse_simple_keyword_returns_page() throws Exception {
 
         SearchDTOs.Book book = new SearchDTOs.Book(
@@ -92,7 +98,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("/api/search/books: q 파라미터로 파싱 후 결과 반환")
+    @DisplayName("GET /api/search/books: q 파라미터로 파싱 후 결과 반환")
     void search_with_operators_returns_result() throws Exception {
         SearchDTOs.Book book = new SearchDTOs.Book(
             "9786242859209",
@@ -114,5 +120,23 @@ class BookControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.searchQuery").value("term-other"))
             .andExpect(jsonPath("$.books[0].id").value("9786242859209"));
+    }
+
+    @Test
+    @DisplayName("GET /api/analytics/search/top10: 인기 검색어 TOP10 조회")
+    void get_top10_keywords_returns_list() throws Exception {
+        var kw1 = new SearchKeyword("spring boot", 10L);
+        var kw2 = new SearchKeyword("tdd", 7L);
+
+        List<SearchKeyword> list = List.of(kw1, kw2);
+
+        Mockito.when(searchAggregateService.getTop10Keywords()).thenReturn(list);
+
+        mockMvc.perform(get("/api/analytics/search/top10").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].keyword").value("spring boot"))
+            .andExpect(jsonPath("$[0].count").value(10))
+            .andExpect(jsonPath("$[1].keyword").value("tdd"))
+            .andExpect(jsonPath("$[1].count").value(7));
     }
 }

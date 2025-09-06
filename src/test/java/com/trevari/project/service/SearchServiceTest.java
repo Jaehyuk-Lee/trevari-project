@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 class SearchServiceTest {
 
     @Mock private BookRepository bookRepository;
+    @Mock private SearchAggregateService searchAggregateService;
     @InjectMocks private SearchService searchService;
 
     @Captor ArgumentCaptor<Pageable> pageableCaptor;
@@ -63,6 +64,9 @@ class SearchServiceTest {
         Pageable used = pageableCaptor.getValue();
         assertThat(used.getPageNumber()).isEqualTo(0);
         assertThat(used.getPageSize()).isEqualTo(10);
+
+        // 인기 검색어 집계는 검색 흐름에서 단 한번만 호출되어야 함
+        verify(searchAggregateService, times(1)).aggregateTop10(query.query());
     }
 
     @Test
