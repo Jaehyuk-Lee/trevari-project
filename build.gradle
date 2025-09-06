@@ -49,6 +49,11 @@ dependencies {
 
     // H2 DB for DataJpaTest
     runtimeOnly 'com.h2database:h2'
+
+    // Swagger (springdoc-openapi)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+      implementation("org.apache.commons:commons-lang3:3.18.0")    // 취약점 패치 버전 강제
+      implementation("org.apache.commons:commons-compress:1.26.0") // 취약점 패치 버전 강제
 }
 
 tasks.named('test') {
