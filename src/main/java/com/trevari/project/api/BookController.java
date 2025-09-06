@@ -2,9 +2,11 @@ package com.trevari.project.api;
 
 import com.trevari.project.aop.MeasureTime;
 import com.trevari.project.api.dto.SearchDTOs;
+import com.trevari.project.api.dto.SearchKeyword;
 import com.trevari.project.search.SearchQuery;
 import com.trevari.project.search.SearchQueryParser;
 import com.trevari.project.service.BookService;
+import com.trevari.project.service.SearchAggregateService;
 import com.trevari.project.service.SearchService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -15,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @AllArgsConstructor
@@ -24,6 +28,7 @@ public class BookController {
 
     private final SearchService searchService;
     private final BookService bookService;
+    private final SearchAggregateService searchAggregateService;
 
     @GetMapping("/books/{id}")
     public ResponseEntity<SearchDTOs.Book> getBook(@PathVariable("id") String id) {
@@ -56,5 +61,11 @@ public class BookController {
         return ResponseEntity.ok(
             searchService.getSearchDTO(parsed, pageable)
         );
+    }
+
+    @GetMapping("/analytics/search/top10")
+    public ResponseEntity<List<SearchKeyword>> getTop10Keywords() {
+        List<SearchKeyword> topKeywords = searchAggregateService.getTop10Keywords();
+        return ResponseEntity.ok(topKeywords);
     }
 }
