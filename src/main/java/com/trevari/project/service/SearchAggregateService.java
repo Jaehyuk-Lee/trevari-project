@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 public class SearchAggregateService {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private static final String SEARCH_KEYWORDS_KEY = "search:keywords:popular";
+    private static final String SEARCH_QUERY_KEY = "search:query:popular";
 
     // 검색어를 집계하여 인기 검색어 순위에 반영 (비동기 처리)
     @Async("searchAggregateExecutor")
@@ -30,7 +30,7 @@ public class SearchAggregateService {
 
         try {
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-            zSetOps.incrementScore(SEARCH_KEYWORDS_KEY, query, 1.0);
+            zSetOps.incrementScore(SEARCH_QUERY_KEY, query, 1.0);
 
             log.debug("검색어 집계 완료: {} (스레드: {})", query, Thread.currentThread().getName());
         } catch (Exception e) {
@@ -44,7 +44,7 @@ public class SearchAggregateService {
     public List<SearchKeyword> getTop10Keywords() {
         try {
             ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-            Set<ZSetOperations.TypedTuple<String>> topWithScores = zSetOps.reverseRangeWithScores(SEARCH_KEYWORDS_KEY, 0, 9);
+            Set<ZSetOperations.TypedTuple<String>> topWithScores = zSetOps.reverseRangeWithScores(SEARCH_QUERY_KEY, 0, 9);
 
             return Optional.ofNullable(topWithScores)
                     .orElseGet(Set::of) // null이면 빈 Set 반환
