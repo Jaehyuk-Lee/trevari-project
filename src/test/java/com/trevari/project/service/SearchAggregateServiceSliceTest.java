@@ -9,6 +9,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisCallback;
@@ -44,16 +45,10 @@ class SearchAggregateServiceSliceTest {
 
     // Testcontainers Redis (테스트 전용)
     @Container
+    @ServiceConnection
     @SuppressWarnings("resource")
     static final GenericContainer<?> redis =
-            new GenericContainer<>(DockerImageName.parse("redis:7"))
-                    .withExposedPorts(6379);
-
-    @DynamicPropertySource
-    static void redisProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.redis.host", redis::getHost);
-        registry.add("spring.redis.port", () -> redis.getMappedPort(6379));
-    }
+            new GenericContainer<>("redis:7").withExposedPorts(6379);
 
     @BeforeEach
     // 테스트 메서드 2개 이상일 경우, 이전 테스트의 부작용이 남지 않도록 처리
