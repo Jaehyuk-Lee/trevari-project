@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 class SearchServiceTest {
 
     @Mock private BookRepository bookRepository;
+    @Mock private SearchAggregateService searchAggregateService;
     @InjectMocks private SearchService searchService;
 
     @Captor ArgumentCaptor<Pageable> pageableCaptor;
