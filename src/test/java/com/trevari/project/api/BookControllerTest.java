@@ -18,12 +18,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -97,6 +100,16 @@ class BookControllerTest {
             .andExpect(jsonPath("$.books[0].id").value("9786247193209"));
     }
 
+    private ResultActions performSearch(String q) throws Exception {
+        return mockMvc.perform(
+                get("/api/search/books")
+                        .param("q", q)
+                        .param("page", "1")
+                        .param("size", "10")
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+    }
+
     @Test
     @DisplayName("GET /api/search/books: q 파라미터로 파싱 후 결과 반환")
     void search_with_operators_returns_result() throws Exception {
@@ -114,12 +127,33 @@ class BookControllerTest {
         SearchDTOs.Metadata metadata2 = new SearchDTOs.Metadata(7L, SearchStrategy.OR_OPERATION);
         SearchDTOs.Response resp = new SearchDTOs.Response("term-other", pageInfo2, Collections.singletonList(book), metadata2);
 
-    Mockito.when(searchService.getSearchDTO(Mockito.<SearchQuery>any(), Mockito.<Pageable>any())).thenReturn(resp);
-        mockMvc.perform(get("/api/search/books").param("q", "term-Other").param("page", "1").param("size", "10")
-                .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.searchQuery").value("term-other"))
-            .andExpect(jsonPath("$.books[0].id").value("9786242859209"));
+        Mockito.when(searchService.getSearchDTO(Mockito.<SearchQuery>any(), Mockito.<Pageable>any())).thenReturn(resp);
+        performSearch("term-Other")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.searchQuery").value("term-other"))
+                .andExpect(jsonPath("$.books[0].id").value("9786242859209"));
+    }
+
+    @Test
+    @DisplayName("GET /api/search/books: 인기 검색어 집계 1회만 호출하는지 검증")
+    void search_with_operators_aggregates() throws Exception {
+        SearchDTOs.Book book = new SearchDTOs.Book(
+                "9786242859209",
+                "테스트 도서 제목",
+                "",
+                "",
+                "저자2",
+                "isbn-b2",
+                java.time.LocalDate.now()
+        );
+
+        SearchDTOs.PageInfo pageInfo2 = new SearchDTOs.PageInfo(1, 10, 1, 1L);
+        SearchDTOs.Metadata metadata2 = new SearchDTOs.Metadata(7L, SearchStrategy.OR_OPERATION);
+        SearchDTOs.Response resp = new SearchDTOs.Response("term-other", pageInfo2, Collections.singletonList(book), metadata2);
+
+        Mockito.when(searchService.getSearchDTO(Mockito.<SearchQuery>any(), Mockito.<Pageable>any())).thenReturn(resp);
+        performSearch("term-Other").andExpect(status().isOk());
+        verify(searchAggregateService, times(1)).aggregateTop10(eq("term-other"));
     }
 
     @Test
