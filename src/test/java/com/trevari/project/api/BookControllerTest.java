@@ -63,7 +63,7 @@ class BookControllerTest {
             "",
             "",
             "저자",
-            "isbn-1",
+            "9786247377209",
             "출판사",
             java.time.LocalDate.now()
         );
@@ -86,7 +86,7 @@ class BookControllerTest {
             "",
             "",
             "저자1",
-            "isbn-b1",
+            "9786247193209",
             java.time.LocalDate.now()
         );
 
@@ -122,7 +122,7 @@ class BookControllerTest {
             "",
             "",
             "저자2",
-            "isbn-b2",
+            "9786242859209",
             java.time.LocalDate.now()
         );
 
@@ -146,7 +146,7 @@ class BookControllerTest {
                 "",
                 "",
                 "저자2",
-                "isbn-b2",
+                "9786242859209",
                 java.time.LocalDate.now()
         );
 
