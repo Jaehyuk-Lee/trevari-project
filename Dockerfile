@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM gradle:8.10.2-jdk17-alpine AS build
+FROM gradle:8.10.2-jdk17 AS build
 WORKDIR /workspace
 COPY . .
 RUN gradle clean bootJar --no-daemon
