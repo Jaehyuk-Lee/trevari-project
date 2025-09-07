@@ -1,6 +1,6 @@
 package com.trevari.project.service;
 
-import com.trevari.project.api.dto.SearchDTOs;
+import com.trevari.project.api.dto.BookDetailDTO;
 import com.trevari.project.domain.Book;
 import com.trevari.project.exception.NotFoundException;
 import com.trevari.project.repository.BookRepository;
@@ -24,8 +24,8 @@ class BookServiceTest {
     @InjectMocks private BookService bookService;
 
     @Test
-    @DisplayName("getBookDTOById() - 존재하는 도서면 DTO 반환")
-    void getBookDTOById_returnsDto_whenFound() {
+    @DisplayName("getBookDetailDTO() - 존재하는 도서면 DTO 반환")
+    void getBookDetailDTOById_returnsDetailDto_whenFound() {
         var book = Book.builder()
                 .isbn("9781617291609")
                 .title("MongoDB in Action")
@@ -34,18 +34,18 @@ class BookServiceTest {
 
         when(bookRepository.findById("9781617291609")).thenReturn(Optional.of(book));
 
-        SearchDTOs.Book dto = bookService.getBookDTO("9781617291609");
+        BookDetailDTO dto = bookService.getBookDetailDTO("9781617291609");
 
         assertThat(dto).isNotNull();
         assertThat(dto.title()).isEqualTo("MongoDB in Action");
     }
 
     @Test
-    @DisplayName("getBookDTOById() - 없는 도서면 NotFoundException 발생")
-    void getBookDTOById_throwsNotFound_whenMissing() {
+    @DisplayName("getBookDetailDTO() - 없는 도서면 NotFoundException 발생")
+    void getBookDetailDTOById_throwsNotFound_whenMissing() {
         when(bookRepository.findById("missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bookService.getBookDTO("missing"))
+        assertThatThrownBy(() -> bookService.getBookDetailDTO("missing"))
                 .isInstanceOf(NotFoundException.class);
     }
 }
