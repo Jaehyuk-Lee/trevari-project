@@ -36,7 +36,7 @@ public final class SearchDTOs {
             @Schema(description = "전체 요소 수") long totalElements
     ) {}
 
-    @Schema(description = "단건 도서 응답 구조")
+    @Schema(description = "검색 결과 도서 정보")
     public record Book(
             @Schema(description = "식별자 (ISBN과 동일)") String id,
             @Schema(description = "도서 제목") String title,

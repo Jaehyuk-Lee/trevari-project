@@ -1,5 +1,6 @@
 package com.trevari.project.api;
 
+import com.trevari.project.api.dto.BookDetailDTO;
 import com.trevari.project.api.dto.SearchDTOs;
 import com.trevari.project.api.dto.SearchKeyword;
 import com.trevari.project.search.SearchQuery;
@@ -56,21 +57,23 @@ class BookControllerTest {
     @Test
     @DisplayName("GET /api/books/{ID}: ID로 도서 반환")
     void get_book_by_id_returns_book() throws Exception {
-        SearchDTOs.Book book = new SearchDTOs.Book(
+        BookDetailDTO book = new BookDetailDTO(
             "9786247377209",
             "테스트 도서",
             "",
             "",
             "저자",
             "isbn-1",
+            "출판사",
             java.time.LocalDate.now()
         );
 
-        Mockito.when(bookService.getBookDTO(eq("9786247377209"))).thenReturn(book);
+        Mockito.when(bookService.getBookDetailDTO(eq("9786247377209"))).thenReturn(book);
         mockMvc.perform(get("/api/books/9786247377209").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value("9786247377209"))
-            .andExpect(jsonPath("$.title").value("테스트 도서"));
+            .andExpect(jsonPath("$.title").value("테스트 도서"))
+            .andExpect(jsonPath("$.publisher").value("출판사"));
     }
 
     @Test

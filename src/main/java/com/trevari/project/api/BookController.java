@@ -1,6 +1,7 @@
 package com.trevari.project.api;
 
 import com.trevari.project.aop.MeasureTime;
+import com.trevari.project.api.dto.BookDetailDTO;
 import com.trevari.project.api.dto.SearchDTOs;
 import com.trevari.project.api.dto.SearchKeyword;
 import com.trevari.project.search.SearchQuery;
@@ -53,8 +54,8 @@ public class BookController {
      */
     @GetMapping("/books/{id}")
     @Operation(summary = "책 단건 조회", description = "ID로 책 상세 정보를 조회합니다.")
-    public ResponseEntity<SearchDTOs.Book> getBook(@PathVariable("id") String id) {
-        return ResponseEntity.ok(bookService.getBookDTO(id));
+    public ResponseEntity<BookDetailDTO> getBook(@PathVariable("id") String id) {
+        return ResponseEntity.ok(bookService.getBookDetailDTO(id));
     }
 
     /**
