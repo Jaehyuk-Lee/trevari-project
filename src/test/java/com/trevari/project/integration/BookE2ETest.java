@@ -31,12 +31,44 @@ public class BookE2ETest {
     @Autowired
     TestRestTemplate restTemplate;
 
+    @Autowired
+    BookRepository bookRepository;
+
     // Testcontainers Redis (테스트 전용)
     @Container
     @ServiceConnection
     @SuppressWarnings("resource")
     static final GenericContainer<?> redis =
             new GenericContainer<>("redis:7").withExposedPorts(6379);
+
+    @BeforeEach
+    void setupSeed() {
+        bookRepository.deleteAll();
+
+        bookRepository.save(
+            Book.builder()
+                .isbn("9781617291609")
+                .title("Spring in Action - Test Seed")
+                .subtitle("Integration Test")
+                .author("Craig Walls")
+                .publisher("Manning")
+                .publishedDate(LocalDate.of(2018, 1, 1))
+                .image("")
+                .build()
+        );
+    }
+
+    @Test
+    @DisplayName("통합: 단건 조회 API E2E")
+    void getBookById() {
+
+        String id = "9781617291609";
+        String url = "/api/books/" + id;
+        ResponseEntity<SearchDTOs.Book> resp = restTemplate.getForEntity(url, SearchDTOs.Book.class);
+        assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(resp.getBody()).isNotNull();
+        assertThat(resp.getBody().id()).isNotBlank();
+    }
 
     @Test
     @DisplayName("통합: 단순 키워드 검색 -> Redis 집계 반영 및 인기검색어 확인")
