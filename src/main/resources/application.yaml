@@ -4,29 +4,24 @@ spring:
   application:
     name: project
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
   sql:
     init:
       mode: always
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: update
     properties:
       hibernate.format_sql: true
+    defer-datasource-initialization: true
 
-  flyway:
-    enabled: false
-    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 springdoc:
   api-docs:
