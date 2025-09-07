@@ -1,22 +1,18 @@
-# 프로젝트 마무리 단계 작업
-# app도 함께 컨테이너 빌드 및 실행하도록 주석 제거
-# (현재는 Intellij 디버깅 활용하기 위해 주석 처리 및 직접 실행)
-# db, redis 포트 정보 제거
-
 services:
-#  app:
-#    build:
-#      context: .
-#      dockerfile: docker/Dockerfile
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8
-#      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-#      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
-#      SPRING_REDIS_HOST: ${SPRING_REDIS_HOST}
-#    ports: ["8080:8080"]
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports: ["8080:8080"]
 
   db:
     image: mysql:8.4
@@ -25,7 +21,6 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports: ["3306:3306"]
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_0900_ai_ci
@@ -37,4 +32,3 @@ services:
 
   redis:
     image: redis:7
-    ports: ["6379:6379"]
