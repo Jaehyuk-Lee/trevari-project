@@ -15,13 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SearchService {
     private final BookRepository bookRepository;
-    private final SearchAggregateService searchAggregateService;
 
     @Transactional(readOnly = true)
     public SearchDTOs.Response getSearchDTO(SearchQuery searchQuery, Pageable pageable) {
-        // 검색어 집계 (인기 검색어 TOP10)
-        searchAggregateService.aggregateTop10(searchQuery.query());
-        
         Page<Book> pageData = bookRepository.findAll(BookSpecifications.forQuery(searchQuery), pageable);
         var items = pageData.getContent().stream()
             .map(b -> new SearchDTOs.Book(

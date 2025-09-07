@@ -97,6 +97,8 @@ public class BookController {
         @Parameter(description = "페이지 사이즈") @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size
     ) {
         SearchQuery parsed = SearchQueryParser.parse(q); // OR/NOT/SIMPLE 판정
+        // 검색어 집계 (인기 검색어 TOP10)
+        searchAggregateService.aggregateTop10(parsed.query());
         Pageable pageable = PageRequest.of(page - 1, size);
         return ResponseEntity.ok(
             searchService.getSearchDTO(parsed, pageable)
