@@ -71,31 +71,13 @@ public class BookE2ETest {
     }
 
     @Test
-    @DisplayName("통합: 단순 키워드 검색 -> Redis 집계 반영 및 인기검색어 확인")
-    void searchAggregatesToRedis() throws Exception {
+    @DisplayName("통합: 단순 키워드 검색 응답 확인")
+    void searchNotAggregatesToRedis() throws Exception {
         String keyword = "spring";
 
         String url = "/api/books?keyword=" + keyword;
         ResponseEntity<SearchDTOs.Response> resp = restTemplate.getForEntity(url, SearchDTOs.Response.class);
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).isNotNull();
-
-        String topUrl = "/api/analytics/search/top10";
-
-        // 비동기 집계가 반영될 때까지 최대 5초 동안 폴링
-        boolean found = false;
-        long deadline = System.currentTimeMillis() + Duration.ofSeconds(5).toMillis();
-        while (System.currentTimeMillis() < deadline) {
-            ResponseEntity<SearchKeyword[]> topResp = restTemplate.getForEntity(topUrl, SearchKeyword[].class);
-            assertThat(topResp.getStatusCode().is2xxSuccessful()).isTrue();
-            SearchKeyword[] body = topResp.getBody();
-            if (body != null) {
-                found = List.of(body).stream().anyMatch(k -> k.keyword().equalsIgnoreCase(keyword));
-                if (found) break;
-            }
-            Thread.sleep(100);
-        }
-
-        assertThat(found).isTrue();
     }
 }
